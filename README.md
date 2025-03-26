@@ -1,5 +1,5 @@
 
-![Kayıt 2025-03-27 013519](https://github.com/user-attachments/assets/a4942b76-0e1a-434b-9f9e-16951b9497d7)
+![Kayıt 2025-03-27 013519](https://github.com/user-attachments/assets/817f66c1-72b1-40dd-b059-2c9ee2ec7118)
 
 # IT Toolbox
 
