@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güvenlik Ayarları</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='logo.svg') }}" alt="IT Toolbox Logo">
+                </a>
+            </div>
+            <nav class="navbar-menu">
+                <ul>
+                    <li><a href="#">Hakkında</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Çözümler <span class="dropdown-arrow">▼</span></a>
+                    </li>
+                    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('manage_users') }}">Kullanıcı Yönetimi</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="navbar-search">
+                <form action="{{ url_for('search') }}" method="get">
+                    <input type="text" name="q" placeholder="Ara" value="{{ search_query or '' }}">
+                </form>
+            </div>
+            <div class="navbar-profile dropdown">
+                {% if current_user.is_authenticated %}
+                <a href="#" class="profile-toggle">
+                    <div class="profile-avatar">
+                        {% if current_user.profile_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}" alt="Profil">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='avatar.svg') }}" alt="Profil">
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="dropdown-menu profile-dropdown">
+                    <ul>
+                        <li><a href="{{ url_for('profiles') }}">Profil</a></li>
+                        <li><a href="{{ url_for('security') }}">Ayarlar</a></li>
+                        <li><a href="{{ url_for('logout') }}">Çıkış Yap</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a href="{{ url_for('auth', form='login') }}" class="profile-toggle">
+                    <span class="sign-in-button">Giriş Yap</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Mesajları -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} text-center">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Ana İçerik -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8 mx-auto">
+                <div class="my-4">
+                    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" id="home-tab" data-toggle="tab" href="{{ url_for('profiles') }}" role="tab" aria-controls="home" aria-selected="true">Profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" id="profile-tab" data-toggle="tab" href="{{ url_for('security') }}" role="tab" aria-controls="profile" aria-selected="false">Güvenlik</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Bildirimler</a>
+                        </li>
+                    </ul>
+                    <h5 class="mb-0 mt-5">Güvenlik Ayarları</h5>
+                    <p>Bu ayarlar hesabınızı güvende tutmanıza yardımcı olur.</p>
+                    <div class="list-group mb-5 shadow">
+                        <!-- Aktivite Logları -->
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <strong class="mb-2">Aktivite Loglarını Etkinleştir</strong>
+                                    <p class="text-muted mb-0">Hesabınızdaki aktiviteleri kaydedin.</p>
+                                </div>
+                                <div class="col-auto">
+                                    <form method="POST" action="{{ url_for('toggle_activity_logs') }}">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="activityLog" name="activity_logs" {% if current_user.activity_logs %}checked{% endif %} onchange="this.form.submit()">
+                                            <span class="custom-control-label"></span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 2FA Authentication -->
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <strong class="mb-2">İki Faktörlü Doğrulama (2FA)</strong>
+                                    {% if current_user.two_factor_auth %}
+                                    <span class="badge badge-pill badge-success">Etkin</span>
+                                    {% else %}
+                                    <span class="badge badge-pill badge-danger">Devre Dışı</span>
+                                    {% endif %}
+                                    <p class="text-muted mb-0">Hesabınıza ek bir güvenlik katmanı ekleyin.</p>
+                                </div>
+                                <div class="col-auto">
+                                    <form method="POST" action="{{ url_for('toggle_two_factor_auth') }}">
+                                        <button class="btn btn-primary btn-sm" type="submit">
+                                            {% if current_user.two_factor_auth %}Devre Dışı Bırak{% else %}Etkinleştir{% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- PIN Kodu -->
+                        <div class="list-group-item">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <strong class="mb-2">PIN Kodunu Etkinleştir</strong>
+                                    <p class="text-muted mb-0">Hesabınıza erişim için bir PIN kodu belirleyin.</p>
+                                </div>
+                                <div class="col-auto">
+                                    <form method="POST" action="{{ url_for('toggle_pin_code') }}">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="pinCode" name="pin_code" {% if current_user.pin_code_enabled %}checked{% endif %} onchange="this.form.submit()">
+                                            <span class="custom-control-label"></span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="mb-0">Son Aktiviteler</h5>
+                    <p>Hesabınızdaki son aktiviteler.</p>
+                    <table class="table border bg-white">
+                        <thead>
+                            <tr>
+                                <th>Cihaz</th>
+                                <th>Konum</th>
+                                <th>IP</th>
+                                <th>Zaman</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activities %}
+                            <tr>
+                                <th scope="col"><i class="fas fa-globe fa-12 text-muted mr-2"></i>{{ activity.device }}</th>
+                                <td>{{ activity.location }}</td>
+                                <td>{{ activity.ip }}</td>
+                                <td>{{ activity.time }}</td>
+                                <td><a href="#" class="text-muted"><i class="fas fa-times"></i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

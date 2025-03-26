@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi</title>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='profiles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='manage_users.css') }}">
+
+    <!-- Bootstrap CSS (Modal ve tablo için gerekli) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navbar (Daha önceki şablonlardan alınacak) -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='logo.svg') }}" alt="IT Toolbox Logo">
+                </a>
+            </div>
+            <nav class="navbar-menu">
+                <ul>
+                    <li><a href="#">Hakkında</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Çözümler <span class="dropdown-arrow">▼</span></a>
+                    </li>
+                    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('manage_users') }}">Kullanıcı Yönetimi</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="navbar-search">
+                <form action="{{ url_for('search') }}" method="get">
+                    <input type="text" name="q" placeholder="Ara" value="{{ search_query or '' }}">
+                </form>
+            </div>
+            <div class="navbar-profile dropdown">
+                {% if current_user.is_authenticated %}
+                <a href="#" class="profile-toggle">
+                    <div class="profile-avatar">
+                        {% if current_user.profile_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}" alt="Profil">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='avatar.svg') }}" alt="Profil">
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="dropdown-menu profile-dropdown">
+                    <ul>
+                        <li><a href="{{ url_for('profiles') }}">Profil</a></li>
+                        <li><a href="{{ url_for('security') }}">Ayarlar</a></li>
+                        <li><a href="{{ url_for('logout') }}">Çıkış Yap</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a href="{{ url_for('auth', form='login') }}" class="profile-toggle">
+                    <span class="sign-in-button">Giriş Yap</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Mesajları -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} text-center">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Ana İçerik -->
+    <div class="container">
+        <div class="row flex-lg-nowrap">
+            <div class="col-12 col-lg-auto mb-3" style="width: 200px;">
+                <div class="card p-3">
+                    <div class="e-navlist e-navlist--active-bg">
+                        <ul class="nav">
+                            <li class="nav-item"><a class="nav-link px-2" href="{{ url_for('profiles') }}"><i class="fa fa-fw fa-bar-chart mr-1"></i><span>Genel Bakış</span></a></li>
+                            <li class="nav-item"><a class="nav-link px-2 active" href="{{ url_for('manage_users') }}"><i class="fa fa-fw fa-th mr-1"></i><span>Kullanıcı Yönetimi</span></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="e-tabs mb-3 px-3">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="#">Kullanıcılar</a></li>
+                    </ul>
+                </div>
+
+                <div class="row flex-lg-nowrap">
+                    <div class="col mb-3">
+                        <div class="e-panel card">
+                            <div class="card-body">
+                                <div class="card-title">
+                                    <h6 class="mr-2"><span>Kullanıcılar</span><small class="px-1">Bilge bir lider ol</small></h6>
+                                </div>
+                                <div class="e-table">
+                                    <div class="table-responsive table-lg mt-3">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="align-top">
+                                                        <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0">
+                                                            <input type="checkbox" class="custom-control-input" id="all-items">
+                                                            <label class="custom-control-label" for="all-items"></label>
+                                                        </div>
+                                                    </th>
+                                                    <th>Fotoğraf</th>
+                                                    <th class="max-width">Ad</th>
+                                                    <th class="sortable">Katılım Tarihi</th>
+                                                    <th>Durum</th>
+                                                    <th>İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for user in users %}
+                                                <tr>
+                                                    <td class="align-middle">
+                                                        <div class="custom-control custom-control-inline custom-checkbox custom-control-nameless m-0 align-top">
+                                                            <input type="checkbox" class="custom-control-input" id="item-{{ user.id }}">
+                                                            <label class="custom-control-label" for="item-{{ user.id }}"></label>
+                                                        </div>
+                                                    </td>
+                                                    <td class="align-middle text-center">
+                                                        <div class="bg-light d-inline-flex justify-content-center align-items-center align-top" style="width: 35px; height: 35px; border-radius: 3px;">
+                                                            {% if user.profile_image %}
+                                                            <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" alt="Profil" style="width: 35px; height: 35px; object-fit: cover;">
+                                                            {% else %}
+                                                            <i class="fa fa-fw fa-photo" style="opacity: 0.8;"></i>
+                                                            {% endif %}
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-nowrap align-middle">{{ user.first_name }} {{ user.last_name }}</td>
+                                                    <td class="text-nowrap align-middle"><span>{{ user.joined_date }}</span></td>
+                                                    <td class="text-center align-middle">
+                                                        <i class="fa fa-fw text-secondary cursor-pointer {% if user.role == 'admin' %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
+                                                    </td>
+                                                    <td class="text-center align-middle">
+                                                        <div class="btn-group align-top">
+                                                            <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary badge">Düzenle</a>
+                                                            <a href="{{ url_for('delete_user', user_id=user.id) }}" class="btn btn-sm btn-outline-secondary badge" onclick="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?');"><i class="fa fa-trash"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="d-flex justify-content-center">
+                                        <ul class="pagination mt-3 mb-0">
+                                            <li class="disabled page-item"><a href="#" class="page-link">‹</a></li>
+                                            <li class="active page-item"><a href="#" class="page-link">1</a></li>
+                                            <li class="page-item"><a href="#" class="page-link">2</a></li>
+                                            <li class="page-item"><a href="#" class="page-link">3</a></li>
+                                            <li class="page-item"><a href="#" class="page-link">4</a></li>
+                                            <li class="page-item"><a href="#" class="page-link">5</a></li>
+                                            <li class="page-item"><a href="#" class="page-link">›</a></li>
+                                            <li class="page-item"><a href="#" class="page-link">»</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-3 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-center px-xl-3">
+                                    <button class="btn btn-success btn-block" type="button" data-toggle="modal" data-target="#user-form-modal">Yeni Kullanıcı</button>
+                                </div>
+                                <hr class="my-3">
+                                <div class="e-navlist e-navlist--active-bold">
+                                    <ul class="nav">
+                                        <li class="nav-item active"><a href="" class="nav-link"><span>Tümü</span> <small>/ {{ users|length }}</small></a></li>
+                                        <li class="nav-item"><a href="" class="nav-link"><span>Aktif</span> <small>/ {{ users|selectattr('role', 'equalto', 'admin')|list|length }}</small></a></li>
+                                        <li class="nav-item"><a href="" class="nav-link"><span>Seçili</span> <small>/ 0</small></a></li>
+                                    </ul>
+                                </div>
+                                <hr class="my-3">
+                                <div>
+                                    <div class="form-group">
+                                        <label>Tarih Aralığı:</label>
+                                        <div>
+                                            <input id="dates-range" class="form-control flatpickr-input" placeholder="01 Dec 17 - 27 Jan 18" type="text" readonly="readonly">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>İsme Göre Ara:</label>
+                                        <div><input class="form-control w-100" type="text" placeholder="Ad" value=""></div>
+                                    </div>
+                                </div>
+                                <hr class="my-3">
+                                <div class="">
+                                    <label>Durum:</label>
+                                    <div class="px-2">
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" name="user-status" id="users-status-disabled">
+                                            <label class="custom-control-label" for="users-status-disabled">Pasif</label>
+                                        </div>
+                                    </div>
+                                    <div class="px-2">
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" name="user-status" id="users-status-active">
+                                            <label class="custom-control-label" for="users-status-active">Aktif</label>
+                                        </div>
+                                    </div>
+                                    <div class="px-2">
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" name="user-status" id="users-status-any" checked="">
+                                            <label class="custom-control-label" for="users-status-any">Hepsi</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Form Modal -->
+                <div class="modal fade" role="dialog" tabindex="-1" id="user-form-modal">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Yeni Kullanıcı Oluştur</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="py-1">
+                                    <form class="form" method="POST" action="{{ url_for('add_new_user') }}">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label>Ad</label>
+                                                            <input class="form-control" type="text" name="first_name" placeholder="Ad" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label>Soyad</label>
+                                                            <input class="form-control" type="text" name="last_name" placeholder="Soyad" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label>Kullanıcı Adı</label>
+                                                            <input class="form-control" type="text" name="username" placeholder="Kullanıcı Adı" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label>E-posta</label>
+                                                            <input class="form-control" type="email" name="email" placeholder="user@example.com" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label>Şifre</label>
+                                                            <input class="form-control" type="password" name="password" placeholder="Şifre" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <label>Rol</label>
+                                                            <select class="form-control" name="role">
+                                                                <option value="user">Kullanıcı</option>
+                                                                <option value="admin">Admin</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col mb-3">
+                                                        <div class="form-group">
+                                                            <label>Hakkında</label>
+                                                            <textarea class="form-control" name="bio" rows="5" placeholder="Biyografi"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col d-flex justify-content-end">
+                                                <button class="btn btn-primary" type="submit">Değişiklikleri Kaydet</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (Modal için gerekli) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

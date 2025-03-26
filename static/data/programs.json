@@ -1,0 +1,102 @@
+[
+  {
+    "name": "Ana Araçlar",
+    "programs": [
+      {
+        "name": "Xsrsylog",
+        "description": "SSL-VPN active directory kullanıcı yönetimi.",
+        "url": "http://192.168.1.121:3000/home"
+      },
+      {
+        "name": "Guacview",
+        "description": "Ağ içerisindeki kullanıcıları yönetme.",
+        "url": "http://192.168.1.121:3030/home"
+      },
+      {
+        "name": "Connector",
+        "description": "Birsürü uygulamayı birbirine bağlayan platform.",
+        "url": "https://www.cpuid.com/softwares/cpu-z.html"
+      }
+    ]
+  },
+  {
+    "name": "Yapay Zeka Araçları",
+    "programs": [
+      {
+        "name": "Grok",
+        "description": "XAI tarafından geliştirilen yapay zeka sohbet aracı.",
+        "url": "https://grok.com/"
+      },
+      {
+        "name": "ChatGPT",
+        "description": "OpenAI tarafından geliştirilen yapay zeka sohbet aracı.",
+        "url": "https://chat.openai.com/"
+      },
+      {
+        "name": "DeepSeek",
+        "description": "Gelişmiş yapay zeka dil modeli ve sohbet aracı.",
+        "url": "https://chat.deepseek.com/"
+      },
+      {
+        "name": "Claude.ai",
+        "description": "Anthropic tarafından geliştirilen yapay zeka asistanı.",
+        "url": "https://claude.ai/new"
+      },
+      {
+        "name": "Gemini",
+        "description": "Google tarafından geliştirilen çok modlu yapay zeka modeli.",
+        "url": "https://gemini.google.com/"
+      }
+    ]
+  },
+  {
+    "name": "Tarayıcılar",
+    "programs": [
+      {
+        "name": "Tor Browser",
+        "description": "Popüler web tarayıcı.",
+        "url": "https://www.torproject.org/tr/download/"
+      },
+      {
+        "name": "Brave Browser",
+        "description": "Popüler web tarayıcı.",
+        "url": "https://brave.com/download/"
+      },
+      {
+        "name": "Google Chrome",
+        "description": "Popüler web tarayıcı.",
+        "url": "https://www.google.com/chrome"
+      },
+      {
+        "name": "Mozilla Firefox",
+        "description": "Alternatif web tarayıcı.",
+        "url": "https://www.mozilla.org/firefox"
+      },
+      {
+        "name": "Microsoft Edge",
+        "description": "Windows'a entegre web tarayıcı.",
+        "url": "https://www.microsoft.com/edge"
+      }
+    ]
+  },
+  {
+    "name": "İş Zekası Araçları",
+    "programs": [
+      {
+        "name": "Power BI",
+        "description": "Microsoft'un iş zekası ve veri analizi platformu.",
+        "url": "https://powerbi.microsoft.com/"
+      },
+      {
+        "name": "Google Analytics",
+        "description": "Web sitesi trafiği ve kullanıcı etkileşimi analizi için bir araç.",
+        "url": "https://analytics.google.com/analytics/web/"
+      },
+      {
+        "name": "QlikView",
+        "description": "İş zekası ve veri analizi platformu.",
+        "url": "https://www.qlik.com/us/trial/qlikview"
+      }
+    ]
+  }
+]

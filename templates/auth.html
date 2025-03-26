@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!-- Coding By CodingNepal - codingnepalweb.com -->
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Giriş Yap & Kayıt Ol</title>
+  <!---Custom CSS File--->
+  <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+</head>
+<body>
+  <div class="container">
+    <input type="checkbox" id="check" {% if active_form == 'register' %}checked{% endif %}>
+    <input type="checkbox" id="check-2fa" {% if active_form == 'verify_2fa' %}checked{% endif %}>
+    <div class="login form">
+      <header>Giriş Yap</header>
+      <form method="POST">
+        <input type="hidden" name="form_type" value="login">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages and active_form == 'login' %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <input type="email" name="email" placeholder="E-postanızı girin" required>
+        <input type="password" name="password" placeholder="Şifrenizi girin" required>
+        <div class="checkbox-text">
+          <div class="checkbox-content">
+            <input type="checkbox" id="logCheck" name="logCheck">
+            <label for="logCheck" class="text">Beni hatırla</label>
+          </div>
+          <a href="{{ url_for('forgot_password') }}">Şifremi unuttum?</a>
+        </div>
+        <input type="submit" class="button" value="Giriş Yap">
+      </form>
+      <div class="signup">
+        <span class="signup">Hesabınız yok mu?
+         <label for="check">Kayıt Ol</label>
+        </span>
+      </div>
+    </div>
+    <div class="registration form">
+      <header>Kayıt Ol</header>
+      <form method="POST">
+        <input type="hidden" name="form_type" value="register">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages and active_form == 'register' %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <input type="text" name="username" placeholder="Kullanıcı adınızı girin" required>
+        <input type="email" name="email" placeholder="E-postanızı girin" required>
+        <input type="password" name="password" placeholder="Şifre oluşturun" required>
+        <input type="password" name="confirm_password" placeholder="Şifreyi onaylayın" required>
+        <div class="checkbox-text">
+          <div class="checkbox-content">
+            <input type="checkbox" id="termCon" name="termCon">
+            <label for="termCon" class="text">Şartları ve koşulları kabul ediyorum</label>
+          </div>
+        </div>
+        <input type="submit" class="button" value="Kayıt Ol">
+      </form>
+      <div class="signup">
+        <span class="signup">Zaten hesabınız var mı?
+         <label for="check">Giriş Yap</label>
+        </span>
+      </div>
+    </div>
+    <div class="verify-2fa form">
+      <header>2FA Doğrulama</header>
+      <form method="POST">
+        <input type="hidden" name="form_type" value="verify_2fa">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages and active_form == 'verify_2fa' %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <input type="text" name="code" placeholder="Doğrulama kodunu girin" required>
+        <input type="submit" class="button" value="Doğrula">
+      </form>
+      <div class="signup">
+        <span class="signup">
+         <label for="check-2fa">Giriş Sayfasına Geri Dön</label>
+        </span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

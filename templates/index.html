@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Yönetimi</title>
+    <!-- Font Awesome CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='logo.svg') }}" alt="IT Toolbox Logo">
+                </a>
+            </div>
+            <nav class="navbar-menu">
+                <ul>
+                    <li><a href="#">Hakkında</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">Çözümler <span class="dropdown-arrow">▼</span></a>
+                    </li>
+                    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('manage_users') }}">Kullanıcı Yönetimi</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="navbar-search">
+                <form action="{{ url_for('search') }}" method="get">
+                    <input type="text" name="q" placeholder="Ara" value="{{ search_query or '' }}">
+                </form>
+            </div>
+            <div class="navbar-profile dropdown">
+                {% if current_user.is_authenticated %}
+                <a href="#" class="profile-toggle">
+                    <div class="profile-avatar">
+                        {% if current_user.profile_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}" alt="Profil">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='avatar.svg') }}" alt="Profil">
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="dropdown-menu profile-dropdown">
+                    <ul>
+                        <li><a href="{{ url_for('profiles') }}">Profil</a></li>
+                        <li><a href="{{ url_for('security') }}">Ayarlar</a></li>
+                        <li><a href="{{ url_for('logout') }}">Çıkış Yap</a></li>
+                    </ul>
+                </div>
+                {% else %}
+                <a href="{{ url_for('auth', form='login') }}" class="profile-toggle">
+                    <span class="sign-in-button">Giriş Yap</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    
+    <div class="page-title">
+        <h1>IT Profesyonelleri İçin Gerekli Programlar</h1>
+    </div>
+    <main>
+        <div class="category-filter">
+            <h3>Kategoriler</h3>
+            <ul>
+                <li><a href="{{ url_for('index') }}" {% if not active_category %}class="active"{% endif %}>Tüm Kategoriler</a></li>
+                {% for category in all_categories or categories %}
+                <li><a href="{{ url_for('show_category', category_name=category.name|lower|replace(' ', '-')) }}" {% if active_category == category.name %}class="active"{% endif %}>{{ category.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="content-area">
+        {% if search_query %}
+        <div class="search-info">
+            <p>"{{ search_query }}" için arama sonuçları:</p>
+            {% if categories|length == 0 %}
+            <p>Sonuç bulunamadı.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if active_category and all_categories %}
+        <div class="category-nav">
+            <a href="{{ url_for('index') }}">Tüm Kategoriler</a>
+        </div>
+        {% endif %}
+
+        {% for category in categories %}
+        <section class="category">
+            <h2>{{ category.name }}</h2>
+            <ul>
+                {% for program in category.programs %}
+                <li><a href="{{ program.url }}" target="_blank">{{ program.name }}</a> - {{ program.description }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endfor %}
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Copyright : Multicore Software Studio </p>
+    </footer>
+</body>
+</html>
