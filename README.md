@@ -51,3 +51,34 @@ it-toolbox-main/                # Ana proje klasörü
 │   ├── logo.svg               # Uygulama logosu
 │   ├── profiles.css           # Profil sayfası stilleri
 │   ├── styles.css             # Genel stil dosyası
+│   ├── data/                  # Veri dosyaları klasörü
+│   │   └── programs.json      # Programlar ve kategoriler verisi
+│   └── uploads/               # Kullanıcı yüklemeleri klasörü
+│       ├── user_1.jpg         # Örnek kullanıcı profil resmi
+│       └── user_2.jpg         # Örnek kullanıcı profil resmi
+└── templates/                 # HTML şablonları klasörü
+    ├── auth.html              # Kimlik doğrulama sayfası (giriş/kayıt)
+    ├── edit_user.html         # Kullanıcı düzenleme sayfası
+    ├── index.html             # Ana sayfa
+    ├── manage_users.html      # Kullanıcı yönetim sayfası (admin)
+    ├── profiles.html          # Kullanıcı profil sayfası
+    ├── security.html          # Güvenlik ayarları sayfası
+    └── setup_2fa.html         # İki faktörlü kimlik doğrulama kurulum sayfası
+```
+## Maintainer
+
+https://github.com/JosephSpace
+
+## Credits
+
+https://github.com/JosephSpace/IT-Toolbox
+
+## Contact
+
+- İnstagram: https://www.instagram.com/joseph.ddf/
+- LinkedIn: https://www.linkedin.com/in/yusuf-aşkın-56015b232/
+- Mail: yusufaliaskin@gmail.com
+
+MIT
+
+The included Freeboard code is redistributed per its MIT License.
